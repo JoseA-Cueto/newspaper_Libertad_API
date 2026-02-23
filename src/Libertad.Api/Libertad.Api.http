@@ -1,0 +1,6 @@
+@Libertad.Api_HostAddress = http://localhost:5237
+
+GET {{Libertad.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
