@@ -1,0 +1,83 @@
+# =========================
+# LIBERTAD API - .NET / C#
+# =========================
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+out/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!**/packages/build/
+!**/packages/repositories.config
+.nuget/
+
+# Logs
+*.log
+logs/
+Log/
+*.tlog
+
+# Test results / coverage
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# ASP.NET / local config / secrets
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.pid
+*.swp
+*.bak
+*~
+
+# Database local artifacts (just in case)
+*.db
+*.sqlite
+*.sqlite3
+
+# Node artifacts (if any helper scripts exist)
+node_modules/
+
+# Generated files (optional)
+Generated/
