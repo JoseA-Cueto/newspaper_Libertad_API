@@ -1,5 +1,7 @@
 using Libertad.Api.Endpoints.Articles;
 using Libertad.Api.Endpoints.Sections;
+using Libertad.Api.Endpoints.Public;
+using Libertad.Application.Articles.Public;
 using Libertad.Application.Articles.Services;
 using Libertad.Application.Articles.Workflow;
 using Libertad.Application.Sections.Services;
@@ -13,6 +15,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<ISectionService, SectionService>();
 builder.Services.AddScoped<IArticleAuthorService, ArticleAuthorService>();
 builder.Services.AddScoped<IArticleWorkflowService, ArticleWorkflowService>();
+builder.Services.AddScoped<IArticlePublicService, ArticlePublicService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
@@ -60,5 +63,6 @@ app.MapGet("/api/error", () => Results.Problem("An unexpected error occurred."))
 app.MapSectionEndpoints();
 app.MapArticleAuthorEndpoints();
 app.MapArticleEditorEndpoints();
+app.MapPublicArticleEndpoints();
 
 app.Run();
