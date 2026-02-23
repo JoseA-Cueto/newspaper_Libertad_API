@@ -1,9 +1,10 @@
+using Libertad.Application.Abstractions;
 using Libertad.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Libertad.Infrastructure.Persistence;
 
-public class LibertadDbContext : DbContext
+public class LibertadDbContext : DbContext, IApplicationDbContext
 {
     public LibertadDbContext(DbContextOptions<LibertadDbContext> options)
         : base(options)
