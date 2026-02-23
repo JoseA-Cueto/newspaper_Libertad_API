@@ -6,5 +6,6 @@ namespace Libertad.Application.Abstractions;
 public interface IApplicationDbContext
 {
     DbSet<Section> Sections { get; }
+    DbSet<Article> Articles { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -1,3 +1,5 @@
+using Libertad.Api.Endpoints.Sections;
+using Libertad.Application.Sections.Services;
 using Libertad.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<ISectionService, SectionService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
@@ -48,5 +51,7 @@ app.MapGet("/api/health", () => Results.Ok(new
 }));
 
 app.MapGet("/api/error", () => Results.Problem("An unexpected error occurred."));
+
+app.MapSectionEndpoints();
 
 app.Run();
