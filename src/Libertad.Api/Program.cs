@@ -1,6 +1,7 @@
 using Libertad.Api.Endpoints.Articles;
 using Libertad.Api.Endpoints.Sections;
 using Libertad.Api.Endpoints.Public;
+using Libertad.Application.Abstractions;
 using Libertad.Application.Articles.Public;
 using Libertad.Application.Articles.Services;
 using Libertad.Application.Articles.Workflow;
@@ -12,10 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<ISectionService, SectionService>();
-builder.Services.AddScoped<IArticleAuthorService, ArticleAuthorService>();
-builder.Services.AddScoped<IArticleWorkflowService, ArticleWorkflowService>();
-builder.Services.AddScoped<IArticlePublicService, ArticlePublicService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
@@ -25,6 +22,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
 
 builder.Services.AddDbContext<LibertadDbContext>(options =>
     options.UseNpgsql(connectionString));
+builder.Services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<LibertadDbContext>());
+
+builder.Services.AddScoped<ISectionService, SectionService>();
 
 builder.Services.AddCors(options =>
 {
