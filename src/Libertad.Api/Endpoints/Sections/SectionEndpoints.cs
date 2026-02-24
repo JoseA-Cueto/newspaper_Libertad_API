@@ -1,5 +1,6 @@
 using Libertad.Application.Sections.Services;
 using Libertad.Contracts.Sections;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Libertad.Api.Endpoints.Sections;
 
@@ -30,7 +31,7 @@ public static class SectionEndpoints
     }
 
     private static async Task<IResult> GetSections(
-        ISectionService sectionService,
+        [FromServices] ISectionService sectionService,
         CancellationToken cancellationToken)
     {
         try
@@ -45,8 +46,8 @@ public static class SectionEndpoints
     }
 
     private static async Task<IResult> CreateSection(
-        ISectionService sectionService,
-        CreateSectionRequest request,
+        [FromServices] ISectionService sectionService,
+        [FromBody] CreateSectionRequest request,
         CancellationToken cancellationToken)
     {
         try
@@ -70,9 +71,9 @@ public static class SectionEndpoints
     }
 
     private static async Task<IResult> UpdateSection(
-        ISectionService sectionService,
-        Guid id,
-        UpdateSectionRequest request,
+        [FromServices] ISectionService sectionService,
+        [FromRoute] Guid id,
+        [FromBody] UpdateSectionRequest request,
         CancellationToken cancellationToken)
     {
         try

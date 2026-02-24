@@ -1,5 +1,6 @@
 using Libertad.Application.Articles.Services;
 using Libertad.Contracts.Articles;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Libertad.Api.Endpoints.Articles;
 
@@ -38,9 +39,9 @@ public static class ArticleAuthorEndpoints
     }
 
     private static async Task<IResult> CreateArticle(
-        IArticleAuthorService articleService,
-        HttpContext httpContext,
-        CreateArticleRequest request,
+        [FromServices] IArticleAuthorService articleService,
+        [FromServices] HttpContext httpContext,
+        [FromBody] CreateArticleRequest request,
         CancellationToken cancellationToken)
     {
         try
@@ -71,10 +72,10 @@ public static class ArticleAuthorEndpoints
     }
 
     private static async Task<IResult> UpdateArticle(
-        IArticleAuthorService articleService,
-        HttpContext httpContext,
-        Guid id,
-        UpdateArticleRequest request,
+        [FromServices] IArticleAuthorService articleService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
+        [FromBody] UpdateArticleRequest request,
         CancellationToken cancellationToken)
     {
         try
@@ -101,10 +102,10 @@ public static class ArticleAuthorEndpoints
     }
 
     private static async Task<IResult> GetMyArticles(
-        IArticleAuthorService articleService,
-        HttpContext httpContext,
-        int page = 1,
-        int pageSize = 10,
+        [FromServices] IArticleAuthorService articleService,
+        [FromServices] HttpContext httpContext,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         try
@@ -121,9 +122,9 @@ public static class ArticleAuthorEndpoints
     }
 
     private static async Task<IResult> GetMyArticleById(
-        IArticleAuthorService articleService,
-        HttpContext httpContext,
-        Guid id,
+        [FromServices] IArticleAuthorService articleService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try

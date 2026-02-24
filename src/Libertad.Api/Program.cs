@@ -25,6 +25,7 @@ builder.Services.AddDbContext<LibertadDbContext>(options =>
 builder.Services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<LibertadDbContext>());
 
 builder.Services.AddScoped<ISectionService, SectionService>();
+builder.Services.AddScoped<IArticlePublicService, ArticlePublicService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,6 +1,7 @@
 using Libertad.Application.Articles.Services;
 using Libertad.Application.Articles.Workflow;
 using Libertad.Contracts.Articles;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Libertad.Api.Endpoints.Articles;
 
@@ -50,9 +51,9 @@ public static class ArticleEditorEndpoints
     }
 
     private static async Task<IResult> SubmitArticle(
-        IArticleWorkflowService workflowService,
-        HttpContext httpContext,
-        Guid id,
+        [FromServices] IArticleWorkflowService workflowService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
@@ -79,10 +80,10 @@ public static class ArticleEditorEndpoints
     }
 
     private static async Task<IResult> RequestChanges(
-        IArticleWorkflowService workflowService,
-        HttpContext httpContext,
-        Guid id,
-        RequestChangesArticleRequest request,
+        [FromServices] IArticleWorkflowService workflowService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
+        [FromBody] RequestChangesArticleRequest request,
         CancellationToken cancellationToken)
     {
         try
@@ -114,9 +115,9 @@ public static class ArticleEditorEndpoints
     }
 
     private static async Task<IResult> ApproveArticle(
-        IArticleWorkflowService workflowService,
-        HttpContext httpContext,
-        Guid id,
+        [FromServices] IArticleWorkflowService workflowService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
@@ -143,9 +144,9 @@ public static class ArticleEditorEndpoints
     }
 
     private static async Task<IResult> PublishArticle(
-        IArticleWorkflowService workflowService,
-        HttpContext httpContext,
-        Guid id,
+        [FromServices] IArticleWorkflowService workflowService,
+        [FromServices] HttpContext httpContext,
+        [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try

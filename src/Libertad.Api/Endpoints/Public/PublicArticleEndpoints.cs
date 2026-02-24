@@ -1,5 +1,6 @@
 using Libertad.Application.Articles.Public;
 using Libertad.Contracts.Articles;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Libertad.Api.Endpoints.Public;
 
@@ -34,9 +35,9 @@ public static class PublicArticleEndpoints
     }
 
     private static async Task<IResult> GetHome(
-        IArticlePublicService publicService,
-        int page = 1,
-        int pageSize = 10,
+        [FromServices] IArticlePublicService publicService,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         try
@@ -51,10 +52,10 @@ public static class PublicArticleEndpoints
     }
 
     private static async Task<IResult> GetBySectionSlug(
-        IArticlePublicService publicService,
-        string slug,
-        int page = 1,
-        int pageSize = 10,
+        [FromServices] IArticlePublicService publicService,
+        [FromRoute] string slug,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         try
@@ -75,8 +76,8 @@ public static class PublicArticleEndpoints
     }
 
     private static async Task<IResult> GetArticleBySlug(
-        IArticlePublicService publicService,
-        string slug,
+        [FromServices] IArticlePublicService publicService,
+        [FromRoute] string slug,
         CancellationToken cancellationToken = default)
     {
         try
@@ -97,9 +98,9 @@ public static class PublicArticleEndpoints
     }
 
     private static async Task<IResult> GetArchive(
-        IArticlePublicService publicService,
-        int page = 1,
-        int pageSize = 10,
+        [FromServices] IArticlePublicService publicService,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
         try
