@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using System.Reflection;
-
 namespace Libertad.Infrastructure.Persistence;
 
 public class LibertadDbContextFactory : IDesignTimeDbContextFactory<LibertadDbContext>
@@ -16,9 +14,7 @@ public class LibertadDbContextFactory : IDesignTimeDbContextFactory<LibertadDbCo
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false);
 
-        // Add User Secrets using the UserSecretsId from Libertad.Api
-        // This loads secrets from: C:\Users\{user}\AppData\Roaming\Microsoft\UserSecrets\{UserSecretsId}\secrets.json
-        var userSecretsId = "9f84a654-1bee-4b09-a658-5a40a9c02b33"; // From Libertad.Api.csproj
+        var userSecretsId = "9f84a654-1bee-4b09-a658-5a40a9c02b33";
         var userSecretsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Microsoft",
@@ -39,11 +35,7 @@ public class LibertadDbContextFactory : IDesignTimeDbContextFactory<LibertadDbCo
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException(
-                "Connection string 'DefaultConnection' not found in configuration. " +
-                "Set it via User Secrets: " +
-                "dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" " +
-                "\"Host=localhost;Port=5432;Database=libertad_dev;Username=postgres;Password=postgres\" " +
-                "--project src/Libertad.Api");
+                "Connection string 'DefaultConnection' not found in configuration.");
         }
 
         var optionsBuilder = new DbContextOptionsBuilder<LibertadDbContext>();
