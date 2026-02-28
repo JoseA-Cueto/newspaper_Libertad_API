@@ -2,17 +2,18 @@ using Libertad.Application.Articles.Services;
 using Libertad.Application.Articles.Workflow;
 using Libertad.Contracts.Articles;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Libertad.Api.Endpoints.Articles;
 
 public static class ArticleEditorEndpoints
 {
-    private const string DevEditorId = "dev-editor";
-
     public static void MapArticleEditorEndpoints(this IEndpointRouteBuilder app)
     {
         var authorGroup = app.MapGroup("/api/articles")
-            .WithName("Articles");
+            .WithName("Articles")
+            .RequireAuthorization("Author");
 
         // Author: submit article
         authorGroup.MapPost("/{id:guid}/submit", SubmitArticle)
@@ -23,7 +24,8 @@ public static class ArticleEditorEndpoints
             .Produces(StatusCodes.Status400BadRequest);
 
         var reviewGroup = app.MapGroup("/api/review/articles")
-            .WithName("ArticleReview");
+            .WithName("ArticleReview")
+            .RequireAuthorization("Editor");
 
         // Editor: request changes
         reviewGroup.MapPost("/{id:guid}/request-changes", RequestChanges)
@@ -52,13 +54,17 @@ public static class ArticleEditorEndpoints
 
     private static async Task<IResult> SubmitArticle(
         [FromServices] IArticleWorkflowService workflowService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
         {
             var authorId = GetAuthorId(httpContext);
+            if (string.IsNullOrWhiteSpace(authorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await workflowService.SubmitArticleAsync(id, authorId, cancellationToken);
 
@@ -81,7 +87,7 @@ public static class ArticleEditorEndpoints
 
     private static async Task<IResult> RequestChanges(
         [FromServices] IArticleWorkflowService workflowService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         [FromBody] RequestChangesArticleRequest request,
         CancellationToken cancellationToken)
@@ -89,6 +95,10 @@ public static class ArticleEditorEndpoints
         try
         {
             var editorId = GetEditorId(httpContext);
+            if (string.IsNullOrWhiteSpace(editorId))
+            {
+                return Results.Unauthorized();
+            }
 
             if (string.IsNullOrWhiteSpace(request.Comment))
             {
@@ -116,13 +126,17 @@ public static class ArticleEditorEndpoints
 
     private static async Task<IResult> ApproveArticle(
         [FromServices] IArticleWorkflowService workflowService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
         {
             var editorId = GetEditorId(httpContext);
+            if (string.IsNullOrWhiteSpace(editorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await workflowService.ApproveArticleAsync(id, editorId, cancellationToken);
 
@@ -145,13 +159,17 @@ public static class ArticleEditorEndpoints
 
     private static async Task<IResult> PublishArticle(
         [FromServices] IArticleWorkflowService workflowService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
         {
             var editorId = GetEditorId(httpContext);
+            if (string.IsNullOrWhiteSpace(editorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await workflowService.PublishArticleAsync(id, editorId, cancellationToken);
 
@@ -172,15 +190,15 @@ public static class ArticleEditorEndpoints
         }
     }
 
-    private static string GetAuthorId(HttpContext httpContext)
+    private static string? GetAuthorId(HttpContext httpContext)
     {
-        var header = httpContext.Request.Headers["X-Author-Id"].FirstOrDefault();
-        return !string.IsNullOrWhiteSpace(header) ? header : "dev-author";
+        return httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
-    private static string GetEditorId(HttpContext httpContext)
+    private static string? GetEditorId(HttpContext httpContext)
     {
-        var header = httpContext.Request.Headers["X-Editor-Id"].FirstOrDefault();
-        return !string.IsNullOrWhiteSpace(header) ? header : DevEditorId;
+        return httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }

@@ -1,17 +1,18 @@
 using Libertad.Application.Articles.Services;
 using Libertad.Contracts.Articles;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Libertad.Api.Endpoints.Articles;
 
 public static class ArticleAuthorEndpoints
 {
-    private const string DevAuthorId = "dev-author";
-
     public static void MapArticleAuthorEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/articles")
-            .WithName("Articles");
+            .WithName("Articles")
+            .RequireAuthorization("Author");
 
         group.MapPost("/", CreateArticle)
             .WithName("CreateArticle")
@@ -40,13 +41,17 @@ public static class ArticleAuthorEndpoints
 
     private static async Task<IResult> CreateArticle(
         [FromServices] IArticleAuthorService articleService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromBody] CreateArticleRequest request,
         CancellationToken cancellationToken)
     {
         try
         {
             var authorId = GetAuthorId(httpContext);
+            if (string.IsNullOrWhiteSpace(authorId))
+            {
+                return Results.Unauthorized();
+            }
 
             if (string.IsNullOrWhiteSpace(request.Title))
             {
@@ -73,7 +78,7 @@ public static class ArticleAuthorEndpoints
 
     private static async Task<IResult> UpdateArticle(
         [FromServices] IArticleAuthorService articleService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         [FromBody] UpdateArticleRequest request,
         CancellationToken cancellationToken)
@@ -81,6 +86,10 @@ public static class ArticleAuthorEndpoints
         try
         {
             var authorId = GetAuthorId(httpContext);
+            if (string.IsNullOrWhiteSpace(authorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await articleService.UpdateArticleAsync(id, authorId, request, cancellationToken);
 
@@ -103,7 +112,7 @@ public static class ArticleAuthorEndpoints
 
     private static async Task<IResult> GetMyArticles(
         [FromServices] IArticleAuthorService articleService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         CancellationToken cancellationToken = default)
@@ -111,6 +120,10 @@ public static class ArticleAuthorEndpoints
         try
         {
             var authorId = GetAuthorId(httpContext);
+            if (string.IsNullOrWhiteSpace(authorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await articleService.GetMyArticlesAsync(authorId, page, pageSize, cancellationToken);
             return Results.Ok(result);
@@ -123,13 +136,17 @@ public static class ArticleAuthorEndpoints
 
     private static async Task<IResult> GetMyArticleById(
         [FromServices] IArticleAuthorService articleService,
-        [FromServices] HttpContext httpContext,
+        HttpContext httpContext,
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         try
         {
             var authorId = GetAuthorId(httpContext);
+            if (string.IsNullOrWhiteSpace(authorId))
+            {
+                return Results.Unauthorized();
+            }
 
             var result = await articleService.GetMyArticleByIdAsync(id, authorId, cancellationToken);
 
@@ -146,23 +163,9 @@ public static class ArticleAuthorEndpoints
         }
     }
 
-    private static string GetAuthorId(HttpContext httpContext)
+    private static string? GetAuthorId(HttpContext httpContext)
     {
-        var header = httpContext.Request.Headers["X-Author-Id"].FirstOrDefault();
-
-        if (!string.IsNullOrWhiteSpace(header))
-        {
-            return header;
-        }
-
-        if (httpContext.RequestServices.GetService(typeof(IWebHostEnvironment)) is IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                return DevAuthorId;
-            }
-        }
-
-        return DevAuthorId;
+        return httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }
